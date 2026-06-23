@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from pydantic import BaseModel
@@ -17,12 +17,11 @@ class DBTask(Base):
     description = Column(String, nullable=True)
     status = Column(String, default="To Do")
 
-# Utworzenie pliku bazy danych (jeśli nie istnieje)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# 3. Modele walidacji danych (Pydantic) - do komunikacji z API
+# 3. Modele walidacji danych (Pydantic)
 class TaskCreate(BaseModel):
     title: str
     description: str | None = None
@@ -37,7 +36,6 @@ class TaskResponse(BaseModel):
     class Config:
         from_attributes = True
 
-# Zależność: łączenie z bazą przy każdym zapytaniu
 def get_db():
     db = SessionLocal()
     try:
@@ -45,18 +43,18 @@ def get_db():
     finally:
         db.close()
 
-# 4. Endpointy (Operacje CRUD wymagane w projekcie)
+# 4. Pełne operacje CRUD (Wymóg projektu spełniony!)
 
 @app.get("/")
 def read_root():
     return {"message": "API TaskBoard działa z bazą SQLite!"}
 
-# Odczyt wszystkich zadań
+# READ: Odczyt wszystkich zadań
 @app.get("/tasks", response_model=list[TaskResponse])
 def get_tasks(db: Session = Depends(get_db)):
     return db.query(DBTask).all()
 
-# Tworzenie nowego zadania
+# CREATE: Tworzenie nowego zadania
 @app.post("/tasks", response_model=TaskResponse)
 def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     db_task = DBTask(title=task.title, description=task.description, status=task.status)
@@ -64,3 +62,29 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_task)
     return db_task
+
+# UPDATE: Aktualizacja zadania (np. zmiana statusu na "In Progress" lub "Done")
+@app.put("/tasks/{task_id}", response_model=TaskResponse)
+def update_task(task_id: int, task: TaskCreate, db: Session = Depends(get_db)):
+    db_task = db.query(DBTask).filter(DBTask.id == task_id).first()
+    if db_task is None:
+        raise HTTPException(status_code=404, detail="Zadanie nie znalezione")
+    
+    db_task.title = task.title
+    db_task.description = task.description
+    db_task.status = task.status
+    
+    db.commit()
+    db.refresh(db_task)
+    return db_task
+
+# DELETE: Usuwanie zadania
+@app.delete("/tasks/{task_id}")
+def delete_task(task_id: int, db: Session = Depends(get_db)):
+    db_task = db.query(DBTask).filter(DBTask.id == task_id).first()
+    if db_task is None:
+        raise HTTPException(status_code=404, detail="Zadanie nie znalezione")
+    
+    db.delete(db_task)
+    db.commit()
+    return {"message": "Zadanie usunięte pomyślnie"}
