@@ -1,15 +1,14 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from pydantic import BaseModel
 
-# 1. Konfiguracja bazy danych SQLite
 SQLALCHEMY_DATABASE_URL = "sqlite:///./taskboard.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# 2. Model bazy danych (Tabela zadań)
 class DBTask(Base):
     __tablename__ = "tasks"
     id = Column(Integer, primary_key=True, index=True)
@@ -21,7 +20,16 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# 3. Modele walidacji danych (Pydantic)
+# --- NOWOŚĆ: Odblokowanie CORS ---
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Pozwala na połączenia z każdej strony (naszego pliku HTML)
+    allow_credentials=True,
+    allow_methods=["*"],  # Pozwala na wszystkie operacje (GET, POST, PUT, DELETE)
+    allow_headers=["*"],
+)
+# ---------------------------------
+
 class TaskCreate(BaseModel):
     title: str
     description: str | None = None
@@ -43,18 +51,14 @@ def get_db():
     finally:
         db.close()
 
-# 4. Pełne operacje CRUD (Wymóg projektu spełniony!)
-
 @app.get("/")
 def read_root():
     return {"message": "API TaskBoard działa z bazą SQLite!"}
 
-# READ: Odczyt wszystkich zadań
 @app.get("/tasks", response_model=list[TaskResponse])
 def get_tasks(db: Session = Depends(get_db)):
     return db.query(DBTask).all()
 
-# CREATE: Tworzenie nowego zadania
 @app.post("/tasks", response_model=TaskResponse)
 def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     db_task = DBTask(title=task.title, description=task.description, status=task.status)
@@ -63,7 +67,6 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     db.refresh(db_task)
     return db_task
 
-# UPDATE: Aktualizacja zadania (np. zmiana statusu na "In Progress" lub "Done")
 @app.put("/tasks/{task_id}", response_model=TaskResponse)
 def update_task(task_id: int, task: TaskCreate, db: Session = Depends(get_db)):
     db_task = db.query(DBTask).filter(DBTask.id == task_id).first()
@@ -78,7 +81,6 @@ def update_task(task_id: int, task: TaskCreate, db: Session = Depends(get_db)):
     db.refresh(db_task)
     return db_task
 
-# DELETE: Usuwanie zadania
 @app.delete("/tasks/{task_id}")
 def delete_task(task_id: int, db: Session = Depends(get_db)):
     db_task = db.query(DBTask).filter(DBTask.id == task_id).first()

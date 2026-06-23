@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskBoard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Mój TaskBoard</h1>
+        
+        <div class="add-task-section">
+            <input type="text" id="task-title" placeholder="Tytuł zadania..." required>
+            <input type="text" id="task-desc" placeholder="Opis (opcjonalnie)...">
+            <button onclick="addTask()">Dodaj zadanie</button>
+        </div>
+
+        <div class="board">
+            <h2>Do zrobienia:</h2>
+            <div id="tasks-list">
+                </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
