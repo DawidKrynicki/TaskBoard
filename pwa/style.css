@@ -6,7 +6,7 @@ body {
     color: #333;
 }
 .container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: auto;
 }
 .add-task-section {
@@ -25,7 +25,7 @@ input {
     border-radius: 4px;
 }
 button {
-    padding: 10px 20px;
+    padding: 10px 15px;
     background-color: #0052cc;
     color: white;
     border: none;
@@ -34,16 +34,43 @@ button {
     font-weight: bold;
 }
 button:hover { background-color: #0047b3; }
+
+
+.kanban-board {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+.column {
+    flex: 1;
+    background-color: #ebecf0;
+    padding: 15px;
+    border-radius: 8px;
+    min-height: 300px;
+}
+.column h2 {
+    margin-top: 0;
+    font-size: 1.2em;
+    color: #172b4d;
+}
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 .task-card {
     background: white;
     padding: 15px;
     border-radius: 5px;
-    margin-bottom: 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     border-left: 4px solid #0052cc;
 }
-.delete-btn { background-color: #ff5630; }
+.task-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 5px;
+}
+.action-btn { background-color: #dfe1e6; color: #172b4d; padding: 5px 10px; font-size: 0.8em; }
+.action-btn:hover { background-color: #c1c7d0; }
+.delete-btn { background-color: #ff5630; color: white;}
 .delete-btn:hover { background-color: #e34927; }

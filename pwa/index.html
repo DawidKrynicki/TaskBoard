@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskBoard</title>
+    <title>TaskBoard PWA</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
     <div class="container">
@@ -16,12 +17,22 @@
             <button onclick="addTask()">Dodaj zadanie</button>
         </div>
 
-        <div class="board">
-            <h2>Do zrobienia:</h2>
-            <div id="tasks-list">
-                </div>
+        <div class="kanban-board">
+            <div class="column">
+                <h2>Do zrobienia</h2>
+                <div class="tasks-list" id="todo-list"></div>
+            </div>
+            <div class="column">
+                <h2>W trakcie</h2>
+                <div class="tasks-list" id="inprogress-list"></div>
+            </div>
+            <div class="column">
+                <h2>Zrobione</h2>
+                <div class="tasks-list" id="done-list"></div>
+            </div>
         </div>
     </div>
+    
     <script src="app.js"></script>
 </body>
 </html>
