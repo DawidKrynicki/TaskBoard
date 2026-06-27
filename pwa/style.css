@@ -64,6 +64,11 @@ button:hover { background-color: #0047b3; }
     border-radius: 5px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.12);
     border-left: 4px solid #0052cc;
+    cursor: grab; 
+}
+.task-card:active {
+    cursor: grabbing; 
+}
 }
 .task-actions {
     margin-top: 10px;

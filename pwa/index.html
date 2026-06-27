@@ -17,16 +17,17 @@
             <button onclick="addTask()">Dodaj zadanie</button>
         </div>
 
+        <!-- Strefy Drag & Drop dla kolumn -->
         <div class="kanban-board">
-            <div class="column">
+            <div class="column" ondrop="drop(event, 'To Do')" ondragover="allowDrop(event)">
                 <h2>Do zrobienia</h2>
                 <div class="tasks-list" id="todo-list"></div>
             </div>
-            <div class="column">
+            <div class="column" ondrop="drop(event, 'In Progress')" ondragover="allowDrop(event)">
                 <h2>W trakcie</h2>
                 <div class="tasks-list" id="inprogress-list"></div>
             </div>
-            <div class="column">
+            <div class="column" ondrop="drop(event, 'Done')" ondragover="allowDrop(event)">
                 <h2>Zrobione</h2>
                 <div class="tasks-list" id="done-list"></div>
             </div>

@@ -4,7 +4,6 @@ async function loadTasks() {
     const response = await fetch(API_URL);
     const tasks = await response.json();
     
-    
     document.getElementById('todo-list').innerHTML = '';
     document.getElementById('inprogress-list').innerHTML = '';
     document.getElementById('done-list').innerHTML = '';
@@ -14,12 +13,13 @@ async function loadTasks() {
         div.className = 'task-card';
         
         
-        let buttonsHtml = '';
-        if (task.status === 'To Do') {
-            buttonsHtml = `<button class="action-btn" onclick="updateStatus(${task.id}, '${task.title}', '${task.description || ''}', 'In Progress')">Rozpocznij</button>`;
-        } else if (task.status === 'In Progress') {
-            buttonsHtml = `<button class="action-btn" onclick="updateStatus(${task.id}, '${task.title}', '${task.description || ''}', 'Done')">Zakończ</button>`;
-        }
+        div.id = `task-${task.id}`;
+        div.draggable = true;
+        div.ondragstart = (e) => {
+            e.dataTransfer.setData('taskId', task.id);
+            e.dataTransfer.setData('taskTitle', task.title);
+            e.dataTransfer.setData('taskDesc', task.description || '');
+        };
         
         div.innerHTML = `
             <div>
@@ -27,11 +27,9 @@ async function loadTasks() {
                 <p style="margin: 5px 0; color: #666; font-size: 0.9em;">${task.description || ''}</p>
             </div>
             <div class="task-actions">
-                ${buttonsHtml}
                 <button class="action-btn delete-btn" onclick="deleteTask(${task.id})">Usuń</button>
             </div>
         `;
-        
         
         if (task.status === 'To Do') document.getElementById('todo-list').appendChild(div);
         else if (task.status === 'In Progress') document.getElementById('inprogress-list').appendChild(div);
@@ -69,8 +67,25 @@ async function deleteTask(id) {
     loadTasks();
 }
 
-loadTasks();
 
+function allowDrop(ev) {
+    ev.preventDefault(); 
+}
+
+async function drop(ev, newStatus) {
+    ev.preventDefault();
+    
+    const id = ev.dataTransfer.getData('taskId');
+    const title = ev.dataTransfer.getData('taskTitle');
+    const desc = ev.dataTransfer.getData('taskDesc');
+    
+    
+    if (id && title) {
+        await updateStatus(id, title, desc, newStatus);
+    }
+}
+
+loadTasks();
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js')

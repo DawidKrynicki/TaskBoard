@@ -20,15 +20,15 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# --- NOWOŚĆ: Odblokowanie CORS ---
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Pozwala na połączenia z każdej strony (naszego pliku HTML)
+    allow_origins=["*"],  
     allow_credentials=True,
-    allow_methods=["*"],  # Pozwala na wszystkie operacje (GET, POST, PUT, DELETE)
+    allow_methods=["*"],  
     allow_headers=["*"],
 )
-# ---------------------------------
+
 
 class TaskCreate(BaseModel):
     title: str
