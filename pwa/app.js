@@ -1,4 +1,4 @@
-const API_URL = 'http://127.0.0.1:8000/tasks';
+const API_URL = 'https://taskboard-dawid.onrender.com/tasks';
 
 async function loadTasks() {
     const response = await fetch(API_URL);
